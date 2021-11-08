@@ -1,6 +1,8 @@
 //The used pin and a counter
 int rWheel = 2;
 int lWheel = 3;
+
+// Counters for Tachometer
 volatile int counterR = 0;
 volatile int counterL = 0;
 
@@ -12,15 +14,20 @@ int motorLeftSpeed = 6;        //PWM A
 int motorRightDirection = 13;   //DIR B
 int motorRightSpeed = 11;       //PWM B
 
+// states 
+enum Modes {INPUTMODE, ACTIVEMODE, PAUSEMODE};
+Modes currentMode = INPUTMODE;
+
+// moving directions 
+// F: forward, R: Right, L: Left, B: Backwads
+enum Direction {F, R, L, B};
+
 int i = 0;
 
-//int route[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+// Test Routes 
+int routeF[] = {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F};
+int route[] = {F, R, F, F, L, B, B, R, B};
 
-int route[] = {1, 2, 1, 1, 3, 4, 4, 2, 1};
-
-enum Modes {INPUTMODE, ACTIVEMODE, PAUSEMODE};
-
-Modes currentMode = INPUTMODE;
 
 void setup() {
   //Declares that the pin is being used for detecting inputs, while activating the pins build in pull-up resistor
@@ -42,7 +49,6 @@ void setup() {
 }
 
 void loop() {
-  
   switch (currentMode) {
     case INPUTMODE: //Forward
       Serial.println("In inputmode");
@@ -69,11 +75,10 @@ void loop() {
     default:
       Serial.println("Ukendt mode");
   }
-  
 }
 
 //Fires when the used pin changes from HIGH->LOW or LOW->HIGH
-void count() {
+void countR() {
   counterR++;
 }
 
@@ -102,28 +107,28 @@ void routing(int leftSpeed, int rightSpeed){
   int j = 0;
   //Beware that the usage Serial can disturb interrupt services
   switch (route[0]) {
-    case 1: //Forward
+    case F: //Forward
       while (j < 20) {
         drive(HIGH, leftSpeed, HIGH, rightSpeed, 5);
       j++;
       }
       break;
       
-    case 2: //Right
+    case R: //Right
       while (j < 3) {
       drive(HIGH, leftSpeed, LOW, rightSpeed, 3);
       j++;
       }
       break;
       
-    case 3: //Left
+    case L: //Left
       while (j < 3) {
       drive(LOW, leftSpeed, HIGH, rightSpeed, 3);
       j++;
       }
       break;
       
-    case 4: //Backwards
+    case B: //Backwards
       while (j < 10) {
       drive(LOW, leftSpeed, LOW, rightSpeed, 10);
       j++;
