@@ -14,9 +14,15 @@ int motorLeftSpeed = 6;        //PWM A
 int motorRightDirection = 13;   //DIR B
 int motorRightSpeed = 11;       //PWM B
 
+//Pins for the multiplexer
+int pinA = A3;
+int pinB = A4;
+int pinC = A5;
+int comeOutInPin = 7;
+
 // states 
 enum Modes {INPUTMODE, ACTIVEMODE, PAUSEMODE};
-Modes currentMode = ACTIVEMODE;
+Modes currentMode = INPUTMODE;
 
 // moving directions 
 // F: forward, R: Right, L: Left, B: Backwads
@@ -25,9 +31,12 @@ enum Direction {F, R, L, B};
 //current direction
 int i = 0;
 
+//Command for route
+int c = 0;
+
 // Test Routes 
 Direction routeF[] = {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F};
-Direction route[] = {F, R, F, F, L, B, B, R, B};
+String route[20];
 
 // atm debug
 boolean pausemodePrinted = false;
@@ -47,12 +56,25 @@ void setup() {
   //Motor B (Right)
   pinMode(motorRightDirection, OUTPUT);
   pinMode(motorRightSpeed, OUTPUT);
+
+  //Multiplexer
+  pinMode(pinA, OUTPUT);
+  pinMode(pinB, OUTPUT);
+  pinMode(pinC, OUTPUT);
+  pinMode(comeOutInPin, INPUT_PULLUP);
   
   //Activates Serial
   Serial.begin(9600);
 }
 
 void loop() {
+    buttonListener("PlayPause", LOW, LOW, LOW);
+    buttonListener("Stop", LOW, LOW, HIGH);
+    buttonListener("Backward", LOW, HIGH, LOW);
+    buttonListener("Left", LOW, HIGH, HIGH);
+    buttonListener("Right", HIGH, LOW, LOW);
+    buttonListener("Forward", HIGH, LOW, HIGH);
+    
     switch (currentMode) {   
     case INPUTMODE: //Forward
       Serial.println("currentMode is:");
@@ -65,7 +87,7 @@ void loop() {
       Serial.println(currentMode);
       compare(counterL, counterR);
       
-      if ((sizeof(routeF)/2) < i ){ // See and change mode if route is finished. 
+      if (sizeof(route) < i ){ // See and change mode if route is finished. 
         Serial.println("currentMode is:");
         Serial.println(currentMode);
         //Serial.println("the route is finished, changed mode to: pause mode");
@@ -112,7 +134,7 @@ void drive(boolean leftDirection, int leftSpeed, boolean rightDirection, int rig
 void routing(int leftSpeed, int rightSpeed){
   int j = 0;
   //Beware that the usage Serial can disturb interrupt services
-  switch (routeF[0]) {
+  switch (route[i]) {
     case F: //Forward
       while (j < 20) {
         drive(HIGH, leftSpeed, HIGH, rightSpeed, 5);
@@ -178,4 +200,75 @@ void countR() {
 }
 void countL() {
   counterL++;
+}
+
+void buttonListener(String button, boolean c, boolean b, boolean a){
+  digitalWrite(pinA, a);
+  digitalWrite(pinB, b);
+  digitalWrite(pinC, c);
+
+  boolean channelValue = digitalRead(comeOutInPin);
+  
+  if (channelValue == HIGH) {
+    Serial.print(button);
+    Serial.println(" was pushed");
+    john(button);
+    delay(100);
+
+    while(channelValue == HIGH) {
+      channelValue = digitalRead(comeOutInPin);  
+    }
+  }
+}
+
+void john(String button){
+  switch (button){
+    case "PlayPause":
+      if (currentMode = INPUTMODE){
+        currentMode = ACTIVEMODE;
+      } else if(currentMode = ACTIVEMODE){
+        currentMode = PAUSEMODE;
+      } 
+      break;
+      
+    case "Stop":
+      currentMode = INPUTMODE;
+      break;
+      
+    case "Forward":
+      if (currentMode = INPUTMODE){
+        route[c] = "F";
+        c++;
+      } else {
+        Serial.println("Wong mode");
+      }
+      break;
+      
+    case "Right":
+      if (currentMode = INPUTMODE){
+        route[c] = "R";
+        c++;
+      } else {
+        Serial.println("Wong mode");
+      }
+      break;
+      
+    case "Left":
+      if (currentMode = INPUTMODE){
+        route[c] = "L";
+        c++;
+      } else {
+        Serial.println("Wong mode");
+      }
+      break;
+      
+    case "Backwards":
+      if (currentMode = INPUTMODE){
+        route[c] = "B";
+        c++;
+      } else {
+        Serial.println("Wong mode");
+      }
+      break;
+  }
 }
