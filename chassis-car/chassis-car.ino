@@ -39,7 +39,7 @@ int c = 0;
 int route[] = {0, 1, 2};
 
 // atm debug
-boolean pausemodePrinted = false;
+boolean modePrinted = false;
 
 
 void setup() {
@@ -68,28 +68,27 @@ void setup() {
 }
 
 void loop() {
+    Serial.println("Pausemode number: ");
+    Serial.println(PAUSEMODE);
     buttonListener(0, LOW, LOW, LOW);
     buttonListener(1, LOW, LOW, HIGH);
     buttonListener(2, LOW, HIGH, LOW);
     buttonListener(3, LOW, HIGH, HIGH);
     buttonListener(4, HIGH, LOW, LOW);
     buttonListener(5, HIGH, LOW, HIGH);
-    
+    if (modePrinted == false){
+        whichState(currentMode);
+        modePrinted = true;
+      }
     switch (currentMode) {   
     case INPUTMODE: //Forward
-      Serial.println("currentMode is:");
-      Serial.println(currentMode);
       //TODO: Listen for inputs
       //If statement - play is pressed = change mode to activemode
       break;
     case ACTIVEMODE: //Right
-      Serial.println("currentMode is:");
-      Serial.println(currentMode);
       compare(counterL, counterR);
       
       if (sizeof(route) < i ){ // See and change mode if route is finished. 
-        Serial.println("currentMode is:");
-        Serial.println(currentMode);
         //Serial.println("the route is finished, changed mode to: pause mode");
         currentMode = PAUSEMODE;
       }
@@ -100,10 +99,6 @@ void loop() {
       //If statement - pause is pressed = change mode to pausemode
       
     case PAUSEMODE: //Left
-      if (pausemodePrinted == false){
-        Serial.println("In pausemode");
-        pausemodePrinted = true;
-      }
       //TODO: set counters to 0
       //resetCounters()
       break;
@@ -224,19 +219,26 @@ void buttonListener(int button, boolean c, boolean b, boolean a){
 void john(int button){
   switch (button){
     case 0: //Play / Pause
-      if (currentMode = INPUTMODE){
+      if (currentMode == INPUTMODE){
         currentMode = ACTIVEMODE;
-      } else if(currentMode = ACTIVEMODE){
+        modePrinted = false;
+      } else if(currentMode == ACTIVEMODE){
         currentMode = PAUSEMODE;
-      } 
+        Serial.println("Testing");
+        modePrinted = false;
+      } else if(currentMode == PAUSEMODE){
+        currentMode = ACTIVEMODE;
+        modePrinted = false;
+      }
       break;
       
     case 1: //Stop
       currentMode = INPUTMODE;
+      modePrinted = false;
       break;
       
     case 2://Forward
-      if (currentMode = INPUTMODE){
+      if (currentMode == INPUTMODE){
         route[c] = 0;
         c++;
       } else {
@@ -245,7 +247,7 @@ void john(int button){
       break;
       
     case 3://Right
-      if (currentMode = INPUTMODE){
+      if (currentMode == INPUTMODE){
         route[c] = 1;
         c++;
       } else {
@@ -254,7 +256,7 @@ void john(int button){
       break;
       
     case 4://Left
-      if (currentMode = INPUTMODE){
+      if (currentMode == INPUTMODE){
         route[c] = 2;
         c++;
       } else {
@@ -263,12 +265,28 @@ void john(int button){
       break;
       
     case 5://Backwards
-      if (currentMode = INPUTMODE){
+      if (currentMode == INPUTMODE){
         route[c] = 3;
         c++;
       } else {
         Serial.println("Wong mode");
       }
       break;
+  }
+}
+
+void whichState(Modes currentMode){
+  switch (currentMode){
+    case 0:
+    Serial.println("Current stage is INPUTMODE");
+    break;
+
+    case 1:
+    Serial.println("Current stage is ACTIVEMODE");
+    break;
+
+    case 2:
+    Serial.println("Current stage is PAUSEMODE");
+    break;
   }
 }
