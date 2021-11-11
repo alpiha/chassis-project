@@ -26,7 +26,7 @@ Modes currentMode = INPUTMODE;
 
 // moving directions 
 // F: forward, R: Right, L: Left, B: Backwads
-enum Direction {F, R, L, B};
+//enum Direction {F, R, L, B};
 
 //current direction
 int i = 0;
@@ -35,8 +35,8 @@ int i = 0;
 int c = 0;
 
 // Test Routes 
-Direction routeF[] = {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F};
-String route[20];
+//Direction routeF[] = {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F};
+int route[] = {0, 1, 2};
 
 // atm debug
 boolean pausemodePrinted = false;
@@ -68,12 +68,12 @@ void setup() {
 }
 
 void loop() {
-    buttonListener("PlayPause", LOW, LOW, LOW);
-    buttonListener("Stop", LOW, LOW, HIGH);
-    buttonListener("Backward", LOW, HIGH, LOW);
-    buttonListener("Left", LOW, HIGH, HIGH);
-    buttonListener("Right", HIGH, LOW, LOW);
-    buttonListener("Forward", HIGH, LOW, HIGH);
+    buttonListener(0, LOW, LOW, LOW);
+    buttonListener(1, LOW, LOW, HIGH);
+    buttonListener(2, LOW, HIGH, LOW);
+    buttonListener(3, LOW, HIGH, HIGH);
+    buttonListener(4, HIGH, LOW, LOW);
+    buttonListener(5, HIGH, LOW, HIGH);
     
     switch (currentMode) {   
     case INPUTMODE: //Forward
@@ -135,28 +135,28 @@ void routing(int leftSpeed, int rightSpeed){
   int j = 0;
   //Beware that the usage Serial can disturb interrupt services
   switch (route[i]) {
-    case F: //Forward
+    case 0: //Forward
       while (j < 20) {
         drive(HIGH, leftSpeed, HIGH, rightSpeed, 5);
       j++;
       }
       break;
       
-    case R: //Right
+    case 1: //Right
       while (j < 3) {
       drive(HIGH, leftSpeed, LOW, rightSpeed, 3);
       j++;
       }
       break;
       
-    case L: //Left
+    case 2: //Left
       while (j < 3) {
       drive(LOW, leftSpeed, HIGH, rightSpeed, 3);
       j++;
       }
       break;
       
-    case B: //Backwards
+    case 3: //Backwards
       while (j < 10) {
       drive(LOW, leftSpeed, LOW, rightSpeed, 10);
       j++;
@@ -202,7 +202,7 @@ void countL() {
   counterL++;
 }
 
-void buttonListener(String button, boolean c, boolean b, boolean a){
+void buttonListener(int button, boolean c, boolean b, boolean a){
   digitalWrite(pinA, a);
   digitalWrite(pinB, b);
   digitalWrite(pinC, c);
@@ -221,9 +221,9 @@ void buttonListener(String button, boolean c, boolean b, boolean a){
   }
 }
 
-void john(String button){
+void john(int button){
   switch (button){
-    case "PlayPause":
+    case 0: //Play / Pause
       if (currentMode = INPUTMODE){
         currentMode = ACTIVEMODE;
       } else if(currentMode = ACTIVEMODE){
@@ -231,40 +231,40 @@ void john(String button){
       } 
       break;
       
-    case "Stop":
+    case 1: //Stop
       currentMode = INPUTMODE;
       break;
       
-    case "Forward":
+    case 2://Forward
       if (currentMode = INPUTMODE){
-        route[c] = "F";
+        route[c] = 0;
         c++;
       } else {
         Serial.println("Wong mode");
       }
       break;
       
-    case "Right":
+    case 3://Right
       if (currentMode = INPUTMODE){
-        route[c] = "R";
+        route[c] = 1;
         c++;
       } else {
         Serial.println("Wong mode");
       }
       break;
       
-    case "Left":
+    case 4://Left
       if (currentMode = INPUTMODE){
-        route[c] = "L";
+        route[c] = 2;
         c++;
       } else {
         Serial.println("Wong mode");
       }
       break;
       
-    case "Backwards":
+    case 5://Backwards
       if (currentMode = INPUTMODE){
-        route[c] = "B";
+        route[c] = 3;
         c++;
       } else {
         Serial.println("Wong mode");
