@@ -83,9 +83,17 @@ void loop() {
     switch (currentMode) {   
     case INPUTMODE: 
       drive(LOW, 0, LOW, 0, 0);
+      if (route == ""){
+        writeShiftRegister(B11000000);
+      }
       break;
     case ACTIVEMODE: 
+<<<<<<< Updated upstream
       compare(counterL, counterR);
+=======
+      writeShiftRegister(B00010000);
+      routing();
+>>>>>>> Stashed changes
       break;   
       //TODO: Run the given route
       //If statement - route is finished = change mode to inputmode
@@ -114,51 +122,95 @@ void drive(boolean leftDirection, int leftSpeed, boolean rightDirection, int rig
   delay(distance);
 }
 
-void routing(int leftSpeed, int rightSpeed){
+void routing(){
   int j = 0;
+  if (route == ""){
+    currentMode = INPUTMODE;
+  }
   for(char x : route) { //TODO Flip route and remove x
     switch (x) {
       case 'f': //Forward
+<<<<<<< Updated upstream
         while (j < 20) {
           drive(HIGH, leftSpeed, HIGH, rightSpeed, 5);
         j++;
+=======
+        while (j < 100) {
+          writeShiftRegister(B00010010);
+          //compare(counterL, counterR, HIGH, HIGH);
+          drive(HIGH, 255, HIGH, 255, 20);
+          j++;
+>>>>>>> Stashed changes
         }
         break;
         
       case 'r': //Right
+<<<<<<< Updated upstream
         while (j < 3) {
         drive(HIGH, leftSpeed, LOW, rightSpeed, 3);
         j++;
+=======
+        while (j < 100) {
+          drive(HIGH, 255, HIGH, 200, 20);
+          writeShiftRegister(B00010100);
+          j++;
+>>>>>>> Stashed changes
         }
         break;
         
       case 'l': //Left
+<<<<<<< Updated upstream
         while (j < 3) {
         drive(LOW, leftSpeed, HIGH, rightSpeed, 3);
         j++;
+=======
+        while (j < 100) {
+          drive(HIGH, 200, HIGH, 255, 20);
+          writeShiftRegister(B00011000);
+          j++;
+>>>>>>> Stashed changes
         }
         break;
         
       case 'b': //Backwards
+<<<<<<< Updated upstream
         while (j < 10) {
         drive(LOW, leftSpeed, LOW, rightSpeed, 10);
         j++;
+=======
+        while (j < 100) {
+          writeShiftRegister(B00010010);
+          //compare(counterL, counterR, LOW, LOW);
+          drive(LOW, 255, LOW, 255, 20);
+          j++;
+>>>>>>> Stashed changes
         }
         break;
       default:
         Serial.println("No route");
+<<<<<<< Updated upstream
   }
   //route.remove(0, 1);
+=======
+      }
+>>>>>>> Stashed changes
   }
+  route.remove(0, 1);
 }
+<<<<<<< Updated upstream
 void compare(int counterL, int counterR){
   //debugC();
+=======
+
+void compare(int counterL, int counterR, boolean a, boolean b){
+  debugC();
+>>>>>>> Stashed changes
   if (counterR == counterL){
-    routing(255, 255);
+    drive(a, 255, b, 255, 5);
   } else if (counterR > counterL){
-    routing(255, 255-(counterR - counterL));
+    drive(a, 255, b, 255-(counterR - counterL), 8);
   } else if (counterR < counterL){
-    routing(255-(counterR - counterL), 255);
+    drive(a, 255-(counterR - counterL), b, 255, 8);
   }
   
 }
@@ -209,6 +261,10 @@ void modeSwitch(int button){
       switch(currentMode){
         case INPUTMODE:
           Serial.println("Testing2");
+          if (route == ""){
+            modePrinted = false;
+            break;
+          }
           currentMode = ACTIVEMODE;
           modePrinted = false;
           break;
