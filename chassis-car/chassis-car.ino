@@ -20,6 +20,12 @@ int pinB = A4;
 int pinC = A5;
 int comeOutInPin = 7;
 
+//ShiftRegister Pins
+int latchPin = 9; //ST_CP or RCLK ()
+int clockPin = 8; //SH_CP or SRCLK ()
+int dataPin = 10; //DS or SER ()
+int clearPin = 5; //MR or SRCLR (Blue)
+
 // states 
 enum Modes {INPUTMODE, ACTIVEMODE, PAUSEMODE};
 Modes currentMode = INPUTMODE;
@@ -63,6 +69,14 @@ void setup() {
   pinMode(pinB, OUTPUT);
   pinMode(pinC, OUTPUT);
   pinMode(comeOutInPin, INPUT_PULLUP);
+
+  pinMode(latchPin, OUTPUT);
+  pinMode(clockPin, OUTPUT);
+  pinMode(dataPin, OUTPUT);
+
+  digitalWrite(latchPin, LOW);
+  digitalWrite(clockPin, LOW);
+  digitalWrite(dataPin, LOW);
   
   //Activates Serial
   Serial.begin(9600);
@@ -76,21 +90,29 @@ void loop() {
     buttonListener(3, LOW, HIGH, HIGH);
     buttonListener(4, HIGH, LOW, LOW);
     buttonListener(5, HIGH, LOW, HIGH);
+
     if (modePrinted == false){
         whichState(currentMode);
         modePrinted = true;
       }
     switch (currentMode) {   
     case INPUTMODE: 
+      writeShiftRegister(B01000000);
       drive(LOW, 0, LOW, 0, 0);
       break;
     case ACTIVEMODE: 
+      writeShiftRegister(B00010000);
       compare(counterL, counterR);
+      if (route = ""){
+        writeShiftRegister(B10010000);
+      }
+      route.remove(0, 1);
       break;   
       //TODO: Run the given route
       //If statement - route is finished = change mode to inputmode
       
     case PAUSEMODE: 
+      writeShiftRegister(B00100000);
       drive(LOW, 0, LOW, 0, 0);
       break;
     default:
@@ -121,36 +143,41 @@ void routing(int leftSpeed, int rightSpeed){
       case 'f': //Forward
         while (j < 20) {
           drive(HIGH, leftSpeed, HIGH, rightSpeed, 5);
-        j++;
+          writeShiftRegister(B00010010);
+          j++;
         }
         break;
         
       case 'r': //Right
         while (j < 3) {
-        drive(HIGH, leftSpeed, LOW, rightSpeed, 3);
-        j++;
+          drive(HIGH, leftSpeed, LOW, rightSpeed, 3);
+          writeShiftRegister(B00010100);
+          j++;
         }
         break;
         
       case 'l': //Left
         while (j < 3) {
-        drive(LOW, leftSpeed, HIGH, rightSpeed, 3);
-        j++;
+          drive(LOW, leftSpeed, HIGH, rightSpeed, 3);
+          writeShiftRegister(B00011000);
+          j++;
         }
         break;
         
       case 'b': //Backwards
         while (j < 10) {
-        drive(LOW, leftSpeed, LOW, rightSpeed, 10);
-        j++;
+          drive(LOW, leftSpeed, LOW, rightSpeed, 10);
+          writeShiftRegister(B00010001);
+          j++;
         }
         break;
       default:
-        Serial.println("No route");
+    Serial.println("No route");
   }
-  //route.remove(0, 1);
+  
   }
 }
+
 void compare(int counterL, int counterR){
   //debugC();
   if (counterR == counterL){
@@ -238,6 +265,7 @@ void modeSwitch(int button){
     case 2://Forward
       if (currentMode == INPUTMODE){
         route += "f";
+        writeShiftRegister(B01000010);
       } else {
         Serial.println("Wong mode");
       }
@@ -246,6 +274,7 @@ void modeSwitch(int button){
     case 3://Right
       if (currentMode == INPUTMODE){
         route += "r";
+        writeShiftRegister(B01000100);
       } else {
         Serial.println("Wong mode");
       }
@@ -254,6 +283,7 @@ void modeSwitch(int button){
     case 4://Left
       if (currentMode == INPUTMODE){
         route += "l";
+        writeShiftRegister(B01001000);
       } else {
         Serial.println("Wong mode");
       }
@@ -262,6 +292,7 @@ void modeSwitch(int button){
     case 5://Backwards
       if (currentMode == INPUTMODE){
         route += "b";
+        writeShiftRegister(B01000001);
       } else {
         Serial.println("Wong mode");
       }
@@ -283,4 +314,16 @@ void whichState(Modes currentMode){
     Serial.println(String(currentMode));
     break;
   }
+}
+
+//Overwrites the entire register and commits the changes
+void writeShiftRegister(int output) {
+  //Bring Latch Pin LOW - prepare to commit the register
+  digitalWrite(latchPin, LOW);
+
+  //Overwrites the entire register
+  shiftOut(dataPin, clockPin, MSBFIRST, output);
+
+  //Bring Latch Pin HIGH - commits the register
+  digitalWrite(latchPin, HIGH);
 }
