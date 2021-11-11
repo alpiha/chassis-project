@@ -29,16 +29,17 @@ Modes currentMode = INPUTMODE;
 //enum Direction {F, R, L, B};
 
 //current direction
-int i = 0;
+//int i = 0;
 
 //Command for route
 int c = 0;
 
 // Test Routes 
 //Direction routeF[] = {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F};
-int route[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-// atm debug
+String route = "fffff";
+
+//atm debug
 boolean modePrinted = false;
 
 
@@ -68,10 +69,7 @@ void setup() {
 }
 
 void loop() {
-    if (modePrinted == false){
-        whichState(currentMode);
-        modePrinted = true;
-      }
+    Serial.println(route);
     buttonListener(0, LOW, LOW, LOW);
     buttonListener(1, LOW, LOW, HIGH);
     buttonListener(2, LOW, HIGH, LOW);
@@ -83,16 +81,16 @@ void loop() {
         modePrinted = true;
       }
     switch (currentMode) {   
-    case INPUTMODE: //Forward
+    case INPUTMODE: 
       drive(LOW, 0, LOW, 0, 0);
       break;
-    case ACTIVEMODE: //Right
+    case ACTIVEMODE: 
       compare(counterL, counterR);
       break;   
       //TODO: Run the given route
       //If statement - route is finished = change mode to inputmode
       
-    case PAUSEMODE: //Left
+    case PAUSEMODE: 
       drive(LOW, 0, LOW, 0, 0);
       break;
     default:
@@ -118,43 +116,40 @@ void drive(boolean leftDirection, int leftSpeed, boolean rightDirection, int rig
 
 void routing(int leftSpeed, int rightSpeed){
   int j = 0;
-  //Beware that the usage Serial can disturb interrupt services
-  switch (route[i]) {
-    case 0: //Forward
-      while (j < 20) {
-        drive(HIGH, leftSpeed, HIGH, rightSpeed, 5);
-      j++;
-      }
-      break;
-      
-    case 1: //Right
-      while (j < 3) {
-      drive(HIGH, leftSpeed, LOW, rightSpeed, 3);
-      j++;
-      }
-      break;
-      
-    case 2: //Left
-      while (j < 3) {
-      drive(LOW, leftSpeed, HIGH, rightSpeed, 3);
-      j++;
-      }
-      break;
-      
-    case 3: //Backwards
-      while (j < 10) {
-      drive(LOW, leftSpeed, LOW, rightSpeed, 10);
-      j++;
-      }
-      break;
-      
-    default:
-      Serial.println(i);
-      Serial.println("No route");
+  for(char x : route) { //TODO Flip route and remove x
+    switch (x) {
+      case 'f': //Forward
+        while (j < 20) {
+          drive(HIGH, leftSpeed, HIGH, rightSpeed, 5);
+        j++;
+        }
+        break;
+        
+      case 'r': //Right
+        while (j < 3) {
+        drive(HIGH, leftSpeed, LOW, rightSpeed, 3);
+        j++;
+        }
+        break;
+        
+      case 'l': //Left
+        while (j < 3) {
+        drive(LOW, leftSpeed, HIGH, rightSpeed, 3);
+        j++;
+        }
+        break;
+        
+      case 'b': //Backwards
+        while (j < 10) {
+        drive(LOW, leftSpeed, LOW, rightSpeed, 10);
+        j++;
+        }
+        break;
+      default:
+        Serial.println("No route");
   }
-  
-  i++;
-  
+  //route.remove(0, 1);
+  }
 }
 void compare(int counterL, int counterR){
   //debugC();
@@ -233,14 +228,16 @@ void modeSwitch(int button){
       break;
       
     case 1: //Stop
+      if (currentMode == INPUTMODE){
+        route = "";
+      }
       currentMode = INPUTMODE;
       modePrinted = false;
       break;
       
     case 2://Forward
       if (currentMode == INPUTMODE){
-        route[c] = 0;
-        c++;
+        route += "f";
       } else {
         Serial.println("Wong mode");
       }
@@ -248,8 +245,7 @@ void modeSwitch(int button){
       
     case 3://Right
       if (currentMode == INPUTMODE){
-        route[c] = 1;
-        c++;
+        route += "r";
       } else {
         Serial.println("Wong mode");
       }
@@ -257,8 +253,7 @@ void modeSwitch(int button){
       
     case 4://Left
       if (currentMode == INPUTMODE){
-        route[c] = 2;
-        c++;
+        route += "l";
       } else {
         Serial.println("Wong mode");
       }
@@ -266,8 +261,7 @@ void modeSwitch(int button){
       
     case 5://Backwards
       if (currentMode == INPUTMODE){
-        route[c] = 3;
-        c++;
+        route += "b";
       } else {
         Serial.println("Wong mode");
       }
@@ -278,15 +272,15 @@ void modeSwitch(int button){
 void whichState(Modes currentMode){
   switch (currentMode){
     case 0:
-    Serial.println("Current stage is INPUTMODE");
+    Serial.println(String(currentMode));
     break;
 
     case 1:
-    Serial.println("Current stage is ACTIVEMODE");
+    Serial.println(String(currentMode));
     break;
 
     case 2:
-    Serial.println("Current stage is PAUSEMODE");
+    Serial.println(String(currentMode));
     break;
   }
 }
