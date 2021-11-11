@@ -106,7 +106,6 @@ void loop() {
       if (route = ""){
         writeShiftRegister(B10010000);
       }
-      route.remove(0, 1);
       break;   
       //TODO: Run the given route
       //If statement - route is finished = change mode to inputmode
