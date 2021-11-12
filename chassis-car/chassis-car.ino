@@ -110,7 +110,7 @@ void loop() {
         currentMode = INPUTMODE;
         break;
       }
-      compare(counterL, counterR);
+      routing();
       writeShiftRegister(B00010000);
       break;   
       //TODO: Run the given route
@@ -141,37 +141,37 @@ void drive(boolean leftDirection, int leftSpeed, boolean rightDirection, int rig
   delay(distance);
 }
 
-void routing(int leftSpeed, int rightSpeed){
+void routing(){
   int j = 0;
   for(char x : route) {
     switch (x) {
       case 'f': //Forward
-        while (j < 20) {
-          drive(HIGH, leftSpeed, HIGH, rightSpeed, 5);
+        while (j < 50) {
+          drive(HIGH, 248, HIGH, 255, 20);
           writeShiftRegister(B00010010);
           j++;
         }
         break;
         
       case 'r': //Right
-        while (j < 3) {
-          drive(HIGH, leftSpeed, LOW, rightSpeed, 3);
+        while (j < 50) {
+          drive(HIGH, 255, HIGH, 210, 20);
           writeShiftRegister(B00010100);
           j++;
         }
         break;
         
       case 'l': //Left
-        while (j < 3) {
-          drive(LOW, leftSpeed, HIGH, rightSpeed, 3);
+        while (j < 50) {
+          drive(HIGH, 203, HIGH, 255, 20);
           writeShiftRegister(B00011000);
           j++;
         }
         break;
         
       case 'b': //Backwards
-        while (j < 10) {
-          drive(LOW, leftSpeed, LOW, rightSpeed, 10);
+        while (j < 50) {
+          drive(LOW, 248, LOW, 255, 20);
           writeShiftRegister(B00010001);
           j++;
         }
@@ -183,7 +183,7 @@ void routing(int leftSpeed, int rightSpeed){
   route.remove(0, 1);
 }
 
-void compare(int counterL, int counterR){
+/*void compare(int counterL, int counterR){
   //debugC();
   if (counterR == counterL){
     routing(255, 255);
@@ -193,7 +193,7 @@ void compare(int counterL, int counterR){
     routing(255-(counterR - counterL), 255);
   }
   
-}
+}*/
 
 void debugC(){ //debug counters
   Serial.println("counterL");
