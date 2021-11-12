@@ -97,15 +97,21 @@ void loop() {
       }
     switch (currentMode) {   
     case INPUTMODE: 
-      writeShiftRegister(B01000000);
+      if (route == ""){
+        writeShiftRegister(B11000000);
+      } else {
+        writeShiftRegister(B01000000);
+      }
       drive(LOW, 0, LOW, 0, 0);
       break;
     case ACTIVEMODE: 
-      writeShiftRegister(B00010000);
-      compare(counterL, counterR);
-      if (route = ""){
-        writeShiftRegister(B10010000);
+      if (route == ""){
+        writeShiftRegister(B11000000);
+        currentMode = INPUTMODE;
+        break;
       }
+      compare(counterL, counterR);
+      writeShiftRegister(B00010000);
       break;   
       //TODO: Run the given route
       //If statement - route is finished = change mode to inputmode
@@ -137,7 +143,7 @@ void drive(boolean leftDirection, int leftSpeed, boolean rightDirection, int rig
 
 void routing(int leftSpeed, int rightSpeed){
   int j = 0;
-  for(char x : route) { //TODO Flip route and remove x
+  for(char x : route) {
     switch (x) {
       case 'f': //Forward
         while (j < 20) {
@@ -173,8 +179,8 @@ void routing(int leftSpeed, int rightSpeed){
       default:
     Serial.println("No route");
   }
-  
   }
+  route.remove(0, 1);
 }
 
 void compare(int counterL, int counterR){
