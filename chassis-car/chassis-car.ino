@@ -1,3 +1,5 @@
+#include <EEPROM.h>
+
 //The used pin and a counter
 int rWheel = 2;
 int lWheel = 3;
@@ -43,13 +45,16 @@ int c = 0;
 // Test Routes 
 //Direction routeF[] = {F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F};
 
-String route = "fffff";
+String route = "";
+
+boolean checkForEEPROM = false;
 
 //atm debug
 boolean modePrinted = false;
 
 
 void setup() {
+  
   //Declares that the pin is being used for detecting inputs, while activating the pins build in pull-up resistor
   pinMode(rWheel, INPUT_PULLUP);
   pinMode(lWheel, INPUT_PULLUP);
@@ -77,12 +82,22 @@ void setup() {
   digitalWrite(latchPin, LOW);
   digitalWrite(clockPin, LOW);
   digitalWrite(dataPin, LOW);
-  
+
   //Activates Serial
   Serial.begin(9600);
 }
 
-void loop() {
+void loop() { 
+    if (checkForEEPROM == false){
+      Serial.println("something???");
+        if (readStringFromEEPROM(0) != ""){
+          route = readStringFromEEPROM(0);
+          writeStringIntoEEPROM(0, "");
+          Serial.println("EEPROM read");
+        }
+    }
+
+    checkForEEPROM = true;
     Serial.println(route);
     buttonListener(0, LOW, LOW, LOW);
     buttonListener(1, LOW, LOW, HIGH);
@@ -96,33 +111,33 @@ void loop() {
         modePrinted = true;
       }
     switch (currentMode) {   
-    case INPUTMODE: 
-      if (route == ""){
-        writeShiftRegister(B11000000);
-      } else {
-        writeShiftRegister(B01000000);
-      }
-      drive(LOW, 0, LOW, 0, 0);
-      break;
-    case ACTIVEMODE: 
-      if (route == ""){
-        writeShiftRegister(B11000000);
-        currentMode = INPUTMODE;
+      case INPUTMODE: 
+        if (route == ""){
+          writeShiftRegister(B11000000);
+        } else {
+          writeShiftRegister(B01000000);
+        }
+        drive(LOW, 0, LOW, 0, 0);
         break;
-      }
-      routing();
-      writeShiftRegister(B00010000);
-      break;   
-      //TODO: Run the given route
-      //If statement - route is finished = change mode to inputmode
-      
-    case PAUSEMODE: 
-      writeShiftRegister(B00100000);
-      drive(LOW, 0, LOW, 0, 0);
-      break;
-    default:
-      Serial.println("Unknown mode, the mode is changed to: pausemode");
-      currentMode = PAUSEMODE;
+      case ACTIVEMODE: 
+        if (route == ""){
+          writeShiftRegister(B11000000);
+          currentMode = INPUTMODE;
+          break;
+        }
+        routing();
+        writeShiftRegister(B00010000);
+        break;   
+        //TODO: Run the given route
+        //If statement - route is finished = change mode to inputmode
+        
+      case PAUSEMODE: 
+        writeShiftRegister(B00100000);
+        drive(LOW, 0, LOW, 0, 0);
+        break;
+      default:
+        Serial.println("Unknown mode, the mode is changed to: pausemode");
+        currentMode = PAUSEMODE;
   }
 }
 //Drives the robot
@@ -177,8 +192,8 @@ void routing(){
         }
         break;
       default:
-    Serial.println("No route");
-  }
+        Serial.println("No route");
+    }
   }
   route.remove(0, 1);
 }
@@ -298,7 +313,8 @@ void modeSwitch(int button){
       if (currentMode == INPUTMODE){
         route += "b";
         writeShiftRegister(B01000001);
-      } else {
+      } else if (currentMode = PAUSEMODE) {
+        writeStringIntoEEPROM(0, route);
         Serial.println("Wong mode");
       }
       break;
@@ -331,4 +347,29 @@ void writeShiftRegister(int output) {
 
   //Bring Latch Pin HIGH - commits the register
   digitalWrite(latchPin, HIGH);
+}
+
+void writeStringIntoEEPROM (int address, String route){
+
+  byte len = route.length();
+  EEPROM.write(address, len);
+
+  for (int i = 0; i < len; i++) {
+    EEPROM.write(address + 1 + i, route[i]);
+  }
+  
+}
+
+String readStringFromEEPROM (int address) {
+
+  int len = EEPROM.read(address);
+  char data[len + 1];
+
+  for (int i = 0; i < len; i++){
+    data[i] = EEPROM.read(address + 1 + i);
+  }
+
+  data[len] = '\0';
+
+  return String(data);
 }
