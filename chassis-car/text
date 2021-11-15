@@ -1,0 +1,20 @@
+ } else if (counterR > counterL){
+    counterProcent = ((float)counterL/(float)counterR)*100;
+    speedAdjustment = 255-(2.55 * counterProcent);   
+    drive(HIGH, (int)speedAdjustment, HIGH, 255, 20);
+
+
+    Serial.println("right is higher, counterprocent: ");
+    Serial.println(counterProcent);
+    Serial.println(speedAdjustment);
+
+  } else if (counterR < counterL){
+    
+    counterProcent = ((float)counterR/(float)counterL)*100;
+    speedAdjustment = 255-(2.55 * counterProcent);  
+    drive(HIGH, (int)speedAdjustment, HIGH, (int)speedAdjustment, 20);
+    
+    
+    Serial.println("Left is higher, counterprocent: ");
+    Serial.println(counterProcent); 
+    Serial.println(speedAdjustment);

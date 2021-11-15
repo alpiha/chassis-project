@@ -109,7 +109,7 @@ void loop() {
     if (modePrinted == false){
         whichState(currentMode);
         modePrinted = true;
-      }
+    }
     switch (currentMode) {   
       case INPUTMODE: 
         if (route == ""){
@@ -142,7 +142,7 @@ void loop() {
 }
 //Drives the robot
 void drive(boolean leftDirection, int leftSpeed, boolean rightDirection, int rightSpeed, int distance) {
-  resetCounters();
+  //resetCounters();
   
   //Motor A (Left)
   digitalWrite(motorLeftDirection, leftDirection);
@@ -162,7 +162,9 @@ void routing(){
     switch (x) {
       case 'f': //Forward
         while (j < 50) {
-          drive(HIGH, 248, HIGH, 255, 20);
+        
+          compare(counterL, counterR);
+          //drive(HIGH, 248, HIGH, 255, 20);
           writeShiftRegister(B00010010);
           j++;
         }
@@ -186,7 +188,8 @@ void routing(){
         
       case 'b': //Backwards
         while (j < 50) {
-          drive(LOW, 248, LOW, 255, 20);
+          compare(counterL, counterR);
+          //drive(LOW, 248, LOW, 255, 20);
           writeShiftRegister(B00010001);
           j++;
         }
@@ -198,17 +201,43 @@ void routing(){
   route.remove(0, 1);
 }
 
-/*void compare(int counterL, int counterR){
-  //debugC();
+void compare(int counterL, int counterR){
+  float counterProcent; 
+  float speedAdjustment;
+  debugC();
   if (counterR == counterL){
-    routing(255, 255);
+    Serial.println("HEY JEG KØRER PERFEKT");
+    //routing(255, 255);
+    drive(HIGH, 255, HIGH, 255, 20);
   } else if (counterR > counterL){
-    routing(255, 255-(counterR - counterL));
+    if (counterL == 0){
+      counterL = 1;
+    }
+    counterProcent = (float)counterL/(float)counterR;
+    counterProcent *= 100;
+    Serial.println("right is higher, counterprocent: ");
+    Serial.println(counterProcent);
+    speedAdjustment = 2.55 * counterProcent;   
+    speedAdjustment = 255 - speedAdjustment;  
+    Serial.println(speedAdjustment);
+    drive(HIGH, 255, HIGH, (int)speedAdjustment, 20);
+    //routing(255, 255-(counterR - counterL));
   } else if (counterR < counterL){
-    routing(255-(counterR - counterL), 255);
+    if (counterR == 0){
+      counterR = 1;
+    }
+    //routing(255-(counterR - counterL), 255);
+    counterProcent = (float)counterR/(float)counterL;
+    counterProcent *= 100;
+    Serial.println("Left is higher, counterprocent: ");
+    Serial.println(counterProcent);
+    speedAdjustment = 2.55 * counterProcent;
+    speedAdjustment = 255 - speedAdjustment;   
+    Serial.println(speedAdjustment);
+    drive(HIGH, (int)speedAdjustment, HIGH, 255, 20);
   }
-  
-}*/
+}
+
 
 void debugC(){ //debug counters
   Serial.println("counterL");
