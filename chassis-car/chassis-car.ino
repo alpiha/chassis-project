@@ -178,7 +178,7 @@ void routing(){
         
       case 'l': //Left
         while (j < 50) {
-          drive(HIGH, 203, HIGH, 255, 20);
+          drive(HIGH, 170, HIGH, 225, 20);
           writeShiftRegister(B00011000);
           j++;
         }
@@ -186,7 +186,7 @@ void routing(){
         
       case 'b': //Backwards
         while (j < 50) {
-          drive(LOW, 248, LOW, 255, 20);
+          drive(LOW, 170, LOW, 255, 20);
           writeShiftRegister(B00010001);
           j++;
         }
@@ -262,7 +262,8 @@ void modeSwitch(int button){
           
         case ACTIVEMODE:
           currentMode = PAUSEMODE;
-          Serial.println("Testing");
+          writeStringIntoEEPROM(0, route);
+          Serial.println("EEPROM loaded");
           modePrinted = false;
           break;
 
@@ -313,8 +314,7 @@ void modeSwitch(int button){
       if (currentMode == INPUTMODE){
         route += "b";
         writeShiftRegister(B01000001);
-      } else if (currentMode = PAUSEMODE) {
-        writeStringIntoEEPROM(0, route);
+      } else {
         Serial.println("Wong mode");
       }
       break;
