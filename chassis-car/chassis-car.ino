@@ -89,7 +89,7 @@ void setup() {
 
 void loop() { 
     if (checkForEEPROM == false){
-      Serial.println("something???");
+      //Serial.println("something???");
         if (readStringFromEEPROM(0) != ""){
           route = readStringFromEEPROM(0);
           writeStringIntoEEPROM(0, "");
@@ -98,7 +98,8 @@ void loop() {
     }
 
     checkForEEPROM = true;
-    Serial.println(route);
+    //Serial.println("Route: ");
+    //Serial.println(route);
     buttonListener(0, LOW, LOW, LOW);
     buttonListener(1, LOW, LOW, HIGH);
     buttonListener(2, LOW, HIGH, LOW);
@@ -186,7 +187,7 @@ void routing(){
         
       case 'b': //Backwards
         while (j < 50) {
-          drive(LOW, 170, LOW, 255, 20);
+          drive(LOW, 248, LOW, 255, 20);
           writeShiftRegister(B00010001);
           j++;
         }
@@ -238,8 +239,6 @@ void buttonListener(int button, boolean c, boolean b, boolean a){
   boolean channelValue = digitalRead(comeOutInPin);
   
   if (channelValue == HIGH) {
-    Serial.print(button);
-    Serial.println(" was pushed");
     modeSwitch(button);
     delay(100);
 
@@ -250,26 +249,28 @@ void buttonListener(int button, boolean c, boolean b, boolean a){
 }
 
 void modeSwitch(int button){
-  Serial.println("button called");
   switch (button){
     case 0: //Play / Pause
       switch(currentMode){
         case INPUTMODE:
-          Serial.println("Testing2");
+          if (route == "") {
+            Serial.println("Insert input before starting");
+            break;
+          } else {
           currentMode = ACTIVEMODE;
           modePrinted = false;
           break;
+          }
           
         case ACTIVEMODE:
           currentMode = PAUSEMODE;
           writeStringIntoEEPROM(0, route);
-          Serial.println("EEPROM loaded");
+          //Serial.println("EEPROM loaded");
           modePrinted = false;
           break;
 
         case PAUSEMODE:
           currentMode = ACTIVEMODE;
-          Serial.println("Testing4");
           modePrinted = false;
           break;
       }
@@ -288,7 +289,7 @@ void modeSwitch(int button){
         route += "f";
         writeShiftRegister(B01000010);
       } else {
-        Serial.println("Wong mode");
+        Serial.println("Wrong mode");
       }
       break;
       
@@ -297,7 +298,7 @@ void modeSwitch(int button){
         route += "r";
         writeShiftRegister(B01000100);
       } else {
-        Serial.println("Wong mode");
+        Serial.println("Wrong mode");
       }
       break;
       
@@ -306,7 +307,7 @@ void modeSwitch(int button){
         route += "l";
         writeShiftRegister(B01001000);
       } else {
-        Serial.println("Wong mode");
+        Serial.println("Wrong mode");
       }
       break;
       
@@ -315,7 +316,7 @@ void modeSwitch(int button){
         route += "b";
         writeShiftRegister(B01000001);
       } else {
-        Serial.println("Wong mode");
+        Serial.println("Wrong mode");
       }
       break;
   }
@@ -324,15 +325,15 @@ void modeSwitch(int button){
 void whichState(Modes currentMode){
   switch (currentMode){
     case 0:
-    Serial.println(String(currentMode));
+    Serial.println("INPUTMODE");
     break;
 
     case 1:
-    Serial.println(String(currentMode));
+    Serial.println("ACTIVEMODE");
     break;
 
     case 2:
-    Serial.println(String(currentMode));
+    Serial.println("PAUSEMODE");
     break;
   }
 }
