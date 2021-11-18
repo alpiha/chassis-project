@@ -163,7 +163,7 @@ void routing(){
       case 'f': //Forward
         while (j < 50) {
         
-          compare(counterL, counterR);
+          adjust(counterL, counterR);
           //drive(HIGH, 248, HIGH, 255, 20);
           writeShiftRegister(B00010010);
           j++;
@@ -188,7 +188,7 @@ void routing(){
         
       case 'b': //Backwards
         while (j < 50) {
-          compare(counterL, counterR);
+          adjust(counterL, counterR);
           //drive(LOW, 248, LOW, 255, 20);
           writeShiftRegister(B00010001);
           j++;
@@ -201,38 +201,31 @@ void routing(){
   route.remove(0, 1);
 }
 
-void compare(int counterL, int counterR){
+void adjust(int counterL, int counterR){
   float counterProcent; 
   float speedAdjustment;
-  debugC();
+  //debugC();
   if (counterR == counterL){
-    Serial.println("HEY JEG KØRER PERFEKT");
-    //routing(255, 255);
+    Serial.println("running perfect");
     drive(HIGH, 255, HIGH, 255, 20);
   } else if (counterR > counterL){
     if (counterL == 0){
       counterL = 1;
     }
-    counterProcent = (float)counterL/(float)counterR;
-    counterProcent *= 100;
-    Serial.println("right is higher, counterprocent: ");
+    counterProcent = ((float)counterL/(float)counterR)*100;
+    Serial.println("Left is higher");
     Serial.println(counterProcent);
-    speedAdjustment = 2.55 * counterProcent;   
-    speedAdjustment = 255 - speedAdjustment;  
+    speedAdjustment = 255 - (2.55 * counterProcent);  
     Serial.println(speedAdjustment);
     drive(HIGH, 255, HIGH, (int)speedAdjustment, 20);
-    //routing(255, 255-(counterR - counterL));
   } else if (counterR < counterL){
     if (counterR == 0){
       counterR = 1;
     }
-    //routing(255-(counterR - counterL), 255);
-    counterProcent = (float)counterR/(float)counterL;
-    counterProcent *= 100;
-    Serial.println("Left is higher, counterprocent: ");
+    counterProcent = ((float)counterR/(float)counterL)*100;
+    Serial.println("Left is higher");
     Serial.println(counterProcent);
-    speedAdjustment = 2.55 * counterProcent;
-    speedAdjustment = 255 - speedAdjustment;   
+    speedAdjustment = 255 - (2.55 * counterProcent);  
     Serial.println(speedAdjustment);
     drive(HIGH, (int)speedAdjustment, HIGH, 255, 20);
   }
