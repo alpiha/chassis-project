@@ -109,7 +109,7 @@ def successor_fn(state):  # Lookup list of successor states
 
 
 INITIAL_STATE = "A"
-GOAL_STATE = "G"
+GOAL_STATE = "P"
 
 
 STATE_SPACE = {
@@ -133,7 +133,6 @@ STATE_SPACE = {
     "R": {"Q": 1, "S": 2},
     "S": {"N": 2, "R": 2},
 }
-
 
 """
 Run tree search and display the nodes in the path to goal node
