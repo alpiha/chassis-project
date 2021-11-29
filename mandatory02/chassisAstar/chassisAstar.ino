@@ -38,6 +38,8 @@ Modes currentMode = INPUTMODE;
 //Command for route
 int i = 0;
 
+// Route
+boolean = isRouteRead = false;
 String route = "";
 
 void setup() {
@@ -345,4 +347,8 @@ boolean checkObstacle(){
     return false;
   }
   return true;
+}
+
+void readfile(){
+  // https://www.youtube.com/watch?v=xc93ygUngmI&ab_channel=Techtutorialsx 
 }
