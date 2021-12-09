@@ -17,7 +17,7 @@ int trig = A5;
 int distance;
 
 int lightLevel = 600;
-int maxSpeed = 225;
+int maxSpeed = 165;
 int minSpeed = 0;
 int normd = 5;
 
@@ -29,7 +29,7 @@ int dataPin = 10; //DS or SER ()
 //Command for route
 int progress = 0;
 
-char route [] = {'L', 'R', 'F'};
+char route [] = {'L', 'L', 'F'};
 
 enum Modes {WOBBLEMODE, FORWARDMODE, LEFTMODE, RIGHTMODE, ENDOFROUTE};
 Modes currentMode = WOBBLEMODE;
@@ -70,6 +70,8 @@ void setup() {
 
 void loop() {
   readSensors();
+  Serial.println("ProgresssS:::");
+  Serial.println(progress);
   /*
   Serial.println("sensorRight:");
   Serial.println(sensorRight);
@@ -117,6 +119,8 @@ void loop() {
       drive(LOW, maxSpeed, LOW, maxSpeed, normd);
       checkIfForward();
     }
+  }else if (currentMode == ENDOFROUTE){
+      drive(LOW, 0, LOW, 0, normd);
   }
 }
 
@@ -124,7 +128,7 @@ void checkIfTurned(int sensorU){
     while (!b2){
       Serial.println("B2 CHECKIFTURNED PRINT");
       int sensor = readSensors(sensorU);
-      sensorDebug();
+      //sensorDebug();
         if (sensor <= lightLevel){
           b1 = true;
           Serial.println("b1 trueeeee");
@@ -141,6 +145,7 @@ void checkIfTurned(int sensorU){
 }
 
 void checkIfForward(){
+  readSensors();
   if (sensorRight <= lightLevel && sensorLeft <= lightLevel){
     currentMode = WOBBLEMODE;
   }
@@ -162,7 +167,7 @@ void checkMode(){
         break;
 
       default:
-        drive(LOW, 0, LOW, 0, normd);
+        currentMode = ENDOFROUTE;
         Serial.println("Route has ended, thanks for joining us");
     }
   }

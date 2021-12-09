@@ -63,7 +63,7 @@ def EXPAND(node):
             s.STATE = child  # e.g. result = 'F' then 'G' from list ['F', 'G']
             s.PARENT_NODE = node
             s.DEPTH = node.DEPTH + 1
-            s.travel = STATE_SPACE[node.STATE][child]
+            s.travel = node.travel + STATE_SPACE[node.STATE][child]
             successors = INSERT(s, successors)
             explored.append(child)
     return successors
@@ -109,7 +109,7 @@ def successor_fn(state):  # Lookup list of successor states
 
 
 INITIAL_STATE = "A"
-GOAL_STATE = "G"
+GOAL_STATE = "P"
 
 
 STATE_SPACE = {
