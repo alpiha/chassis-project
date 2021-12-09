@@ -29,7 +29,7 @@ int dataPin = 10; //DS or SER ()
 //Command for route
 int progress = 0;
 
-char route [] = {'L', 'L', 'F'};
+char route [] = {'F', 'F', 'R', 'L', 'R', 'F', 'F'};
 
 enum Modes {WOBBLEMODE, FORWARDMODE, LEFTMODE, RIGHTMODE, ENDOFROUTE};
 Modes currentMode = WOBBLEMODE;
@@ -78,9 +78,9 @@ void loop() {
   Serial.println("sensorLeft:");
   Serial.println(sensorLeft);
   */
-  writeShiftRegister(B00000000);
+
   Serial.println(getMode());
-  //turnOnLED();
+  turnOnLED();
   
   checkMode();
   
@@ -91,11 +91,11 @@ void loop() {
       drive(LOW, maxSpeed, LOW, maxSpeed, normd);
       
     }else if(sensorRight >= lightLevel){
-      drive(LOW, 0, LOW, maxSpeed, normd);
+      drive(LOW, 60, LOW, maxSpeed, normd);
       Serial.println("sluk right");
       
     }else if(sensorLeft >= lightLevel){
-      drive(LOW, maxSpeed, LOW, 0, normd);
+      drive(LOW, maxSpeed, LOW, 60, normd);
       Serial.println("sluk leftt");
     }
     
@@ -126,7 +126,6 @@ void loop() {
 
 void checkIfTurned(int sensorU){
     while (!b2){
-      Serial.println("B2 CHECKIFTURNED PRINT");
       int sensor = readSensors(sensorU);
       //sensorDebug();
         if (sensor <= lightLevel){
@@ -146,7 +145,9 @@ void checkIfTurned(int sensorU){
 
 void checkIfForward(){
   readSensors();
-  if (sensorRight <= lightLevel && sensorLeft <= lightLevel){
+  if (sensorRight <= lightLevel or sensorLeft <= lightLevel){
+    progress++;
+    Serial.println("progress ++");
     currentMode = WOBBLEMODE;
   }
 }
