@@ -109,7 +109,7 @@ def successor_fn(state):  # Lookup list of successor states
 
 
 INITIAL_STATE = "A"
-GOAL_STATE = "P"
+GOAL_STATE = "S"
 
 
 STATE_SPACE = {
