@@ -1,3 +1,6 @@
+import aStar
+import os
+
 class Point: 
     def __init__(self, name, x,y):
         self.name = name
@@ -9,7 +12,7 @@ TODO: incomingRoute shall be linked to A* algorthim
 world: is where the point are being placed 
 movement: is how long the car is on the route 
 """
-incomingRoute = "ABCDELNMP"
+incomingRoute = aStar.RUN()
 worldMap = []
 movement = []
 
@@ -126,10 +129,18 @@ def SET_UP_WORLDMAP():
     worldMap.append(r)
     worldMap.append(s)
 
+
+"""
+
+"""
+def RUN():
+    os.remove("route.txt")
+    SET_UP_WORLDMAP()
+    SET_UP_CAR_MOVEMENT()
+    GET_DIRECTION()
+
 """
 Starting the application
 """
 if __name__ == "__main__":
-    SET_UP_WORLDMAP()
-    SET_UP_CAR_MOVEMENT()
-    GET_DIRECTION()
+    RUN()

@@ -139,7 +139,7 @@ Run tree search and display the nodes in the path to goal node
 """
 
 
-def run():
+def RUN():
     s = ""
     path = TREE_SEARCH()
     print("Solution path:")
@@ -147,7 +147,7 @@ def run():
         s += node.STATE
     s = s[::-1]
     print(s)
-
+    return s
 
 if __name__ == "__main__":
-    run()
+    RUN()
