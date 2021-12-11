@@ -108,8 +108,8 @@ def successor_fn(state):  # Lookup list of successor states
     return STATE_SPACE[state]  # successor_fn( 'C' ) returns ['F', 'G']
 
 
-INITIAL_STATE = "A"
-GOAL_STATE = "S"
+INITIAL_STATE = "H"
+GOAL_STATE = "R"
 
 
 STATE_SPACE = {
@@ -120,7 +120,7 @@ STATE_SPACE = {
     "E": {"D": 1, "L": 3},
     "F": {"B": 2, "G": 1},
     "G": {"F": 1},
-    "H": {"K": 1, "L": 1},
+    "H": {"K": 1},
     "I": {"A": 4, "J": 1, "O": 2},
     "J": {"I": 1, "M": 1, "K": 1},
     "K": {"J": 1, "H": 1, "L": 1},
@@ -148,6 +148,7 @@ def RUN():
     s = s[::-1]
     print(s)
     return s
+
 
 if __name__ == "__main__":
     RUN()

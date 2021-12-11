@@ -1,10 +1,10 @@
 //Motor A (Left)
-int motorLeftDirection = 12; //DIR A
-int motorLeftSpeed = 3;      //PWM A
+int motorLeftDirection = 12;   //DIR A
+int motorLeftSpeed = 3;        //PWM A
 
 //Motor B (Right)
-int motorRightDirection = 13; //DIR B
-int motorRightSpeed = 11;     //PWM B
+int motorRightDirection = 13;   //DIR B
+int motorRightSpeed = 11;       //PWM B
 
 int sensorR = A2;
 int sensorL = A3;
@@ -16,9 +16,9 @@ int echo = A4;
 int trig = A5;
 int distance;
 
-int lightLevel = 600;
-int maxSpeed = 165;
-int minSpeed = 0;
+int lightLevel = 650;
+int maxSpeed = 160;
+int minSpeed = 50;
 int normd = 5;
 
 //ShiftRegister Pins
@@ -29,16 +29,9 @@ int dataPin = 10; //DS or SER ()
 //Command for route
 int progress = 0;
 
-char route[] = {'F', 'F', 'R', 'L', 'R', 'F', 'F'};
+char route [] = {'F', 'L', 'R', 'F', 'R',};
 
-enum Modes
-{
-  WOBBLEMODE,
-  FORWARDMODE,
-  LEFTMODE,
-  RIGHTMODE,
-  ENDOFROUTE
-};
+enum Modes {WOBBLEMODE, FORWARDMODE, LEFTMODE, RIGHTMODE, ENDOFROUTE};
 Modes currentMode = WOBBLEMODE;
 
 boolean hasStopped = false;
@@ -46,12 +39,11 @@ boolean b1 = false;
 boolean b2 = false;
 boolean b3 = false;
 
-void setup()
-{
+void setup() {
   //Motor A (Left)
   pinMode(motorLeftDirection, OUTPUT);
   pinMode(motorLeftSpeed, OUTPUT);
-
+  
   //Motor B (Right)
   pinMode(motorRightDirection, OUTPUT);
   pinMode(motorRightSpeed, OUTPUT);
@@ -67,7 +59,7 @@ void setup()
 
   pinMode(sensorR, INPUT);
   pinMode(sensorL, INPUT);
-
+  
   digitalWrite(latchPin, LOW);
   digitalWrite(clockPin, LOW);
   digitalWrite(dataPin, LOW);
@@ -76,8 +68,7 @@ void setup()
   Serial.begin(9600);
 }
 
-void loop()
-{
+void loop() {
   readSensors();
   Serial.println("ProgresssS:::");
   Serial.println(progress);
@@ -90,142 +81,117 @@ void loop()
 
   Serial.println(getMode());
   turnOnLED();
-
+  
   checkMode();
-
+  
   //When the sensors both are black
-  if (currentMode == WOBBLEMODE)
-  {
+  if (currentMode == WOBBLEMODE){
     Serial.println("HHHHHHHHHH");
-    if (sensorRight <= lightLevel && sensorLeft <= lightLevel)
-    {
+    if (sensorRight <= lightLevel && sensorLeft <= lightLevel){
       drive(LOW, maxSpeed, LOW, maxSpeed, normd);
-    }
-    else if (sensorRight >= lightLevel)
-    {
-      drive(LOW, 60, LOW, maxSpeed, normd);
+      
+    }else if(sensorRight >= lightLevel){
+      drive(LOW, minSpeed+7, LOW, maxSpeed, normd);
       Serial.println("sluk right");
-    }
-    else if (sensorLeft >= lightLevel)
-    {
-      drive(LOW, maxSpeed, LOW, 60, normd);
+      
+    }else if(sensorLeft >= lightLevel){
+      drive(LOW, maxSpeed+7, LOW, minSpeed, normd);
       Serial.println("sluk leftt");
     }
-  }
-  else if (currentMode == LEFTMODE)
-  {
-    while (currentMode == LEFTMODE)
-    {
+    
+  }else if (currentMode == LEFTMODE){
+    while(currentMode == LEFTMODE){
       Serial.println("LEFT PRINT");
-      drive(LOW, maxSpeed, LOW, 0, normd);
+      drive(LOW, 180, LOW, 0, normd);
       checkIfTurned(sensorLeft);
     }
-  }
-  else if (currentMode == RIGHTMODE)
-  {
-    while (currentMode == RIGHTMODE)
-    {
+    
+  }else if (currentMode == RIGHTMODE){
+    while(currentMode == RIGHTMODE){
       Serial.println("RIGHT PRINT");
-      drive(LOW, 0, LOW, maxSpeed, normd);
+      drive(LOW, 0, LOW, 187, normd);
       checkIfTurned(sensorRight);
-    }
   }
-  else if (currentMode == FORWARDMODE)
-  {
-    while (currentMode == FORWARDMODE)
-    {
+  
+  }else if (currentMode == FORWARDMODE){
+    while(currentMode == FORWARDMODE){
       Serial.println("FORAWRD PRINT");
       drive(LOW, maxSpeed, LOW, maxSpeed, normd);
       checkIfForward();
     }
-  }
-  else if (currentMode == ENDOFROUTE)
-  {
-    drive(LOW, 0, LOW, 0, normd);
+  }else if (currentMode == ENDOFROUTE){
+      drive(LOW, 0, LOW, 0, normd);
   }
 }
 
-void checkIfTurned(int sensorU)
-{
-  while (!b2)
-  {
-    int sensor = readSensors(sensorU);
-    //sensorDebug();
-    if (sensor <= lightLevel)
-    {
-      b1 = true;
-      Serial.println("b1 trueeeee");
-    }
-    if (sensor >= lightLevel && b1)
-    {
-      progress++;
-      Serial.println("progress ++");
-      currentMode = WOBBLEMODE;
-      b2 = true;
-    }
-  }
-  b1 = false;
-  b2 = false;
+void checkIfTurned(int sensorU){
+    while (!b2){
+      int sensor = readSensors(sensorU);
+      //sensorDebug();
+        if (sensor <= lightLevel){
+          b1 = true;
+          Serial.println("b1 trueeeee");
+        }    
+        if (sensor >= lightLevel && b1){
+          progress++;
+          Serial.println("progress ++");
+          currentMode = WOBBLEMODE;
+          b2 = true;
+        }
+      }
+      b1 = false;
+      b2 = false;
 }
 
-void checkIfForward()
-{
+void checkIfForward(){
   readSensors();
-  if (sensorRight <= lightLevel or sensorLeft <= lightLevel)
-  {
+  if (sensorRight <= lightLevel or sensorLeft <= lightLevel){
     progress++;
     Serial.println("progress ++");
     currentMode = WOBBLEMODE;
   }
 }
 
-void checkMode()
-{
-  if (sensorRight >= lightLevel && sensorLeft >= lightLevel)
-  {
-    switch (route[progress])
-    {
-    case 'F':
-      currentMode = FORWARDMODE;
-      break;
+void checkMode(){
+  if (sensorRight >= lightLevel && sensorLeft >= lightLevel){
+    switch(route[progress]){
+      case 'F':
+        currentMode = FORWARDMODE;
+        break;
 
-    case 'L':
-      currentMode = LEFTMODE;
-      break;
+      case 'L':
+        currentMode = LEFTMODE;
+        break;
 
-    case 'R':
-      currentMode = RIGHTMODE;
-      break;
+      case 'R':
+        currentMode = RIGHTMODE;
+        break;
 
-    default:
-      currentMode = ENDOFROUTE;
-      Serial.println("Route has ended, thanks for joining us");
+      default:
+        currentMode = ENDOFROUTE;
+        Serial.println("Route has ended, thanks for joining us");
     }
   }
 }
 
 //Drives the robot
-void drive(boolean leftDirection, int leftSpeed, boolean rightDirection, int rightSpeed, int distance)
-{
-  if (checkObstacle())
-  {
+void drive(boolean leftDirection, int leftSpeed, boolean rightDirection, int rightSpeed, int distance) {
+  if (checkObstacle()){
     //Motor A (Left)
     digitalWrite(motorLeftDirection, leftDirection);
     analogWrite(motorLeftSpeed, leftSpeed);
-
+    
     //Motor B (Right)
     digitalWrite(motorRightDirection, rightDirection);
     analogWrite(motorRightSpeed, rightSpeed);
-
+  
     //Driving distance/time
     delay(distance);
-  }
-  else
-  {
+  } else {
     //Motor A (Left)
     digitalWrite(motorLeftDirection, leftDirection);
     analogWrite(motorLeftSpeed, 0);
-
+    
     //Motor B (Right)
     digitalWrite(motorRightDirection, rightDirection);
     analogWrite(motorRightSpeed, 0);
@@ -233,8 +199,7 @@ void drive(boolean leftDirection, int leftSpeed, boolean rightDirection, int rig
 }
 
 //Overwrites the entire register and commits the changes
-void writeShiftRegister(int output)
-{
+void writeShiftRegister(int output) {
   //Bring Latch Pin LOW - prepare to commit the register
   digitalWrite(latchPin, LOW);
 
@@ -245,90 +210,77 @@ void writeShiftRegister(int output)
   digitalWrite(latchPin, HIGH);
 }
 
-void turnOnLED()
-{
-  switch (route[progress])
-  {
-  case 'F':
-    writeShiftRegister(B00001000);
-    break;
+void turnOnLED(){
+  switch (route[progress]){
+    case 'F': 
+      writeShiftRegister(B00001000);
+      break;
 
-  case 'L':
-    writeShiftRegister(B00000100);
-    break;
+    case 'L': 
+      writeShiftRegister(B00000100);
+      break;
 
-  case 'R':
-    writeShiftRegister(B00000010);
-    break;
+    case 'R': 
+      writeShiftRegister(B00000010);
+      break;
 
-  default:
-    writeShiftRegister(B00000001);
+    default:
+      writeShiftRegister(B00000001);
   }
 }
 
 //function - returns the distance
-int getDistance()
-{
+int getDistance() {
   //sends out a trigger sound
   digitalWrite(trig, LOW);
   delayMicroseconds(10);
   digitalWrite(trig, HIGH);
   delayMicroseconds(10);
   digitalWrite(trig, LOW);
-
+  
   //returns the received echo in centimeter
-  return pulseIn(echo, HIGH) * 0.034 / 2;
+  return pulseIn(echo, HIGH)* 0.034/2;
 }
 
-boolean checkObstacle()
-{
+boolean checkObstacle(){
   distance = getDistance();
-  if (distance <= 30)
-  {
+  if (distance <= 30){
     return false;
   }
   return true;
 }
 
-String getMode()
-{
-  switch (currentMode)
-  {
-  case 0:
-    return "WOBBLEMODE";
-  case 1:
-    return "FORWARDMODE";
-  case 2:
-    return "LEFTMODE";
-  case 3:
-    return "RIGHTMODE";
-  case 4:
-    return "ENDOFROUTE";
+String getMode(){
+  switch(currentMode){
+    case 0:
+      return "WOBBLEMODE";
+    case 1:
+      return "FORWARDMODE";
+    case 2:
+      return "LEFTMODE";
+    case 3:
+      return "RIGHTMODE";
+    case 4:
+      return "ENDOFROUTE";
   }
 }
 
-void sensorDebug()
-{
+void sensorDebug(){
   Serial.println("sensorRight:");
   Serial.println(sensorRight);
   Serial.println("sensorLeft:");
   Serial.println(sensorLeft);
 }
 
-void readSensors()
-{
+void readSensors(){
   sensorRight = analogRead(sensorR);
   sensorLeft = analogRead(sensorL);
 }
 
-int readSensors(int sensorU)
-{
-  if (sensorU == sensorRight)
-  {
+int readSensors(int sensorU){
+  if (sensorU == sensorRight){
     return analogRead(sensorR);
-  }
-  else if (sensorU == sensorLeft)
-  {
+  } else if (sensorU == sensorLeft){
     return analogRead(sensorL);
   }
   return 0;
