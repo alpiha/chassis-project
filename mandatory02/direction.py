@@ -89,7 +89,7 @@ def SET_UP_WORLDMAP():
     h = Point("H",2,3)
     i = Point("I",0,4)
     j = Point("J",1,4)
-    k = Point("K",2,0)
+    k = Point("K",2,4)
     l = Point("L",3,4)
     m = Point("M",1,5)
     n = Point("N",3,5)
