@@ -108,9 +108,8 @@ def successor_fn(state):  # Lookup list of successor states
     return STATE_SPACE[state]  # successor_fn( 'C' ) returns ['F', 'G']
 
 
-INITIAL_STATE = "H"
-GOAL_STATE = "R"
-
+INITIAL_STATE = "A"
+GOAL_STATE = "G"
 
 STATE_SPACE = {
     "A": {"B": 1, "I": 4},
@@ -139,7 +138,8 @@ Run tree search and display the nodes in the path to goal node
 """
 
 
-def RUN():
+
+def RUN_aSTAR() -> str:
     s = ""
     path = TREE_SEARCH()
     print("Solution path:")
@@ -147,8 +147,14 @@ def RUN():
         s += node.STATE
     s = s[::-1]
     print(s)
-    return s
+    WRITE_FILE(s,"a")
 
+
+
+def WRITE_FILE(string, command):
+    file = open("txt.txt", command)
+    file.write(string)
+    file.close()
 
 if __name__ == "__main__":
-    RUN()
+    RUN_aSTAR()
