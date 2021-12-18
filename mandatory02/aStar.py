@@ -1,3 +1,5 @@
+import test
+
 class Node:  # Node has only PARENT_NODE, STATE, DEPTH
     def __init__(self, state, parent=None, depth=0, travel=0):
         self.STATE = state
@@ -109,7 +111,8 @@ def successor_fn(state):  # Lookup list of successor states
 
 
 INITIAL_STATE = "A"
-GOAL_STATE = "G"
+GOAL_STATE = "F"
+
 
 STATE_SPACE = {
     "A": {"B": 1, "I": 4},
@@ -138,8 +141,9 @@ Run tree search and display the nodes in the path to goal node
 """
 
 
-
-def RUN_aSTAR() -> str:
+# -> str
+def run_Astar() -> str:
+    print("A* Algorithm is running")
     s = ""
     path = TREE_SEARCH()
     print("Solution path:")
@@ -147,14 +151,9 @@ def RUN_aSTAR() -> str:
         s += node.STATE
     s = s[::-1]
     print(s)
-    WRITE_FILE(s,"a")
+    return s
+  
 
-
-
-def WRITE_FILE(string, command):
-    file = open("txt.txt", command)
-    file.write(string)
-    file.close()
 
 if __name__ == "__main__":
-    RUN_aSTAR()
+    run_Astar()
